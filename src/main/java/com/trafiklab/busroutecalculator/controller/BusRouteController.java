@@ -66,7 +66,7 @@ import java.util.UUID;
 
 @RestController
 @Validated
-@RequestMapping("/api/v1/busline")
+@RequestMapping("/trafiklab/v1/busline")
 public class BusRouteController {
     @Autowired
     private BusRouteService busRouteService;

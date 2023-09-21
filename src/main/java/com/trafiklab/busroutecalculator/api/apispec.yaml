@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: "http://localhost:8080/trafiklab"
 info:
-  description: API to get SK busline with most stops
+  description: API to get SL busline with most stops
   version: 1.0.0
   title: SL Busline Route
   contact:
@@ -16,6 +16,13 @@ paths:
       summary: Get top 10 SL busline with maximum Stop
       description: Get top 10 SL busline with maximum Stop
       operationId: getBusLineWithMaxStop
+      parameters:
+        - in: query
+          name: apiKey
+          description: pass mandatory apiKey from trafiklab
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/GetBusLineResponse"

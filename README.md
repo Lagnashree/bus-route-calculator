@@ -5,13 +5,15 @@ The objective of this application is to provide a REST API that retrieves inform
 To interact with the Trafiklab's REST API, authentication and rate limiting are essential. Therefore, this application expects to find Trafiklab's API key as an environment variable for proper authentication.
 
 ## Trafiklab's API Key
-### Why Do you need TrafikLab's API Key
+
+### Why do you need TrafikLab's API Key
 
 As previously mentioned, this application relies on the Trafiklab's REST API, which requires an API key for access. The available plan for the Trafiklab API is the bronze plan, offering 5 requests per second and 500 requests per month.
 
 To ensure scalability and flexibility, it is more practical to have consumers provide their own API keys when using the application. Therefore, a query parameter has been incorporated into the HTTP request, allowing consumers to pass their own Trafiklab API Key, which will then be utilized for the necessary Trafiklab API calls.
 
 ### Get the APi key
+
 Follow the below step to get a new trafiklab's API key
  * Step 1: Log in to https://developer.trafiklab.se/login. Register if you dont have an account
  * Step 2: Create a new project

@@ -54,7 +54,7 @@ public class BusRouteControllerTest {
         linesWithMaxStopResponse.setResponseData(lineList);
         Mockito.when(busRouteService.calculateBusRoute(Mockito.any(),Mockito.any())).thenReturn(linesWithMaxStopResponse);
         mockMvc.perform(MockMvcRequestBuilders.
-                        get("/api/v1/busline")
+                        get("/trafiklab/v1/busline")
                         .param("apiKey", "apiKey"))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -71,7 +71,7 @@ public class BusRouteControllerTest {
     @Test
     public void busRouteController_listApi_invalidinput() throws Exception{
         String apiKey = null;
-        mockMvc.perform(get("/api/v1/busline")
+        mockMvc.perform(get("/trafiklab/v1/busline")
                         .param("apiKey", apiKey)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
