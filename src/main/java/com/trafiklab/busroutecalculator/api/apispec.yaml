@@ -1,0 +1,95 @@
+openapi: 3.0.0
+servers:
+  - url: "http://localhost:8080/trafiklab"
+info:
+  description: API to get SK busline with most stops
+  version: 1.0.0
+  title: SL Busline Route
+  contact:
+    name: Lagnashree Dey
+    email: lagnashreedey@gmail.com
+paths:
+  /v1/busline:
+    get:
+      tags:
+        - busline
+      summary: Get top 10 SL busline with maximum Stop
+      description: Get top 10 SL busline with maximum Stop
+      operationId: getBusLineWithMaxStop
+      responses:
+        "200":
+          $ref: "#/components/responses/GetBusLineResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  schemas:
+    statusMessage:
+      description: status of the API invocation
+      type: string
+      example: Success
+    responseData:
+      additionalProperties: false
+      type: array
+      description: contains top 10 bus lines with maximum stops
+      items:
+        $ref: "#/components/schemas/linedescription"
+    linedescription:
+      properties:
+        lineNumberValue:
+          $ref: "#/components/schemas/lineNumberValue"
+        stopNamesValue:
+          type: array
+          items:
+            additionalProperties: false
+            type: string
+            example: Norrsund
+            description: Name of the bus stops
+    lineNumberValue:
+      description: SL Line number
+      type: string
+      example: 637
+    InternalServerErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: error description
+        status:
+          type: number
+          example: 500
+        timestamp:
+          type: string
+          example:
+        path:
+          type: number
+          example: /trafiklab/v1/busline
+  responses:
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/InternalServerErrorResponse"
+    GetBusLineResponse:
+      description: complex object that contains SL bus line with top 10 number of stops
+      headers:
+        unique-rq-id:
+          $ref: "#/components/headers/unique-rq-id"
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            type: object
+            properties:
+              statusMessage:
+                $ref: "#/components/schemas/statusMessage"
+              responseData:
+                $ref: "#/components/schemas/responseData"
+
+  headers:
+    unique-rq-id:
+      schema:
+        type: string
+        example: a2c9c168-11b4-4b11-9643-159bf0eb56e1
+      description: This Unique Request Id will be returned in as a header response for
+        all success calls, and it will used to check and fetch the logs.              
