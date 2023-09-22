@@ -181,8 +181,6 @@ public class BusRouteService {
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
                             response -> Mono.error(new HttpConnectionException("Server error while making SL API Call")))
-                    .onStatus(HttpStatusCode::is4xxClientError,
-                            response -> Mono.error(new HttpConnectionException("Client error while making SL API Call")))
                     .bodyToMono(String.class)
                     .retryWhen(Retry.backoff(3, Duration.ofSeconds(5))
                             .filter(throwable -> throwable instanceof HttpConnectionException))
