@@ -2,13 +2,12 @@
 
 The objective of this application is to provide a REST API that retrieves information about the top 10 SL bus lines with the highest number of stops, including details about all the stops on those lines. This functionality is accomplished by utilizing the Trafiklab's open API, which can be accessed at http://www.trafiklab.se/api/sl-hallplatser-och-linjer-2.
 
-To interact with the Trafiklab's REST API, authentication and rate limiting are essential. Therefore, this application expects to find Trafiklab's API key as an environment variable for proper authentication.
 
 ## Trafiklab's API Key
 
 ### Why do you need TrafikLab's API Key
 
-As previously mentioned, this application relies on the Trafiklab's REST API, which requires an API key for access. The available plan for the Trafiklab API is the bronze plan, offering 5 requests per second and 500 requests per month.
+This application relies on the Trafiklab's REST API, which requires an API key for access. The only available plan for the Trafiklab API is the bronze plan, offering 5 requests per minute and 500 requests per month.
 
 To ensure scalability and flexibility, it is more practical to have consumers provide their own API keys when using the application. Therefore, a query parameter has been incorporated into the HTTP request, allowing consumers to pass their own Trafiklab API Key, which will then be utilized for the necessary Trafiklab API calls.
 
