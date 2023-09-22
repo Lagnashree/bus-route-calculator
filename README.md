@@ -43,7 +43,9 @@ cd bus-route-calculator /
 docker compose up --build
 ```
 
-### Test it with curl. replace <APIKEY>  with the Trafiklab API Key.
+### Test the HTTP endpoint with curl. 
+
+Replace <APIKEY> with a valid Trafiklab API Key and run it in the terminal.
 
 ```
 curl --location --request GET 'http://localhost:8080/api/v1/busline?apiKey=<APIKEY>'
