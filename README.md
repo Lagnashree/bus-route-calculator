@@ -23,28 +23,28 @@ Follow the below step to get a new trafiklab's API key
 ## Run locally
 
 ### Clone the repositiry to local machine
-``
+```
 git clone https://github.com/Lagnashree/bus-route-calculator.git
-``
+```
 
 ### run it with either of the command below (docker compose)
 
-``
+```
 cd bus-route-calculator /
 docker-compose up --build
-``
+```
 
 
 OR         
 
 
-``
+```
 cd bus-route-calculator /
 docker compose up --build
-``
+```
 
 ### Test it with curl. replace <APIKEY>  with the Trafiklab API Key.
 
-``
+```
 curl --location --request GET 'http://localhost:8080/api/v1/busline?apiKey=<APIKEY>'
-``
+```
