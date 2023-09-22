@@ -118,7 +118,7 @@ public class BusRouteServiceTest {
         assertEquals(2, result.size());
     }
     @Test
-    public void BusRouteService_CountBusLineStops_EmprtyArray() {
+    public void BusRouteService_CountBusLineStops_EmptyArray() {
         JSONArray emptyJourneyArr = new JSONArray();
         BusRouteService busLineCounter = new BusRouteService();
         HashMap<String, Integer> emptyResult = busLineCounter.countBusLineStops(emptyJourneyArr);

@@ -67,14 +67,14 @@ public class BusRouteService {
                 lineWithStopNum.get(lineNumber).add((String) stopPontInfo.get(JourneyPatternPointNumber));
             }
         }
-        int count21 = 0;
+        int count1 = 0;
         for (Map.Entry<String, Integer> entry : sortedHashMap.entrySet()) {
-            if (count21 < 10) {
+            if (count1 < 10) {
                 LineWithStops LineWithStopsObj = new LineWithStops();
                 LineWithStopsObj.setLineNumber(entry.getKey());
                 LineWithStopsObj.setStopNames(lineWithStopNum.get(entry.getKey()));
                 responseObjectArray.add(LineWithStopsObj);
-                count21++;
+                count1++;
             } else {
                 break;
             }
