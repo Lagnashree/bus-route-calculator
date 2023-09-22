@@ -28,13 +28,18 @@ git clone https://github.com/Lagnashree/bus-route-calculator.git
 ``
 
 ### run it with either of the command below (docker compose)
+
 ``
-cd bus-route-calculator
+cd bus-route-calculator /
 docker-compose up --build
 ``
-        or
+
+
+OR         
+
+
 ``
-cd bus-route-calculator
+cd bus-route-calculator /
 docker compose up --build
 ``
 
