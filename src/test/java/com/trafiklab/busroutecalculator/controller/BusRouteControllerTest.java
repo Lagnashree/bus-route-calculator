@@ -45,10 +45,10 @@ public class BusRouteControllerTest {
         LinesWithMaxStopResponse linesWithMaxStopResponse=new LinesWithMaxStopResponse();
         List<String> stopNames1= Arrays.asList("stop1", "stop2", "stop3");
         LineWithStops lws1=new LineWithStops("113",stopNames1);
-        List<String> stopNames2= Arrays.asList("stop1", "stop2", "stop3");
-        LineWithStops lws2=new LineWithStops("113",stopNames2);
-        List<String> stopNames3= Arrays.asList("stop1", "stop2", "stop3");
-        LineWithStops lws3=new LineWithStops("113",stopNames3);
+        List<String> stopNames2= Arrays.asList("stop4", "stop5", "stop6");
+        LineWithStops lws2=new LineWithStops("114",stopNames2);
+        List<String> stopNames3= Arrays.asList("stop7", "stop8", "stop9");
+        LineWithStops lws3=new LineWithStops("115",stopNames3);
         List<LineWithStops> lineList =Arrays.asList(lws1,lws2,lws3);
         linesWithMaxStopResponse.setStatusMessage("success");
         linesWithMaxStopResponse.setResponseData(lineList);
