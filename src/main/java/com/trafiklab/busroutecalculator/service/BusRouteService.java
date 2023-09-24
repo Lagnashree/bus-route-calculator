@@ -3,6 +3,8 @@ package com.trafiklab.busroutecalculator.service;
 import java.time.Duration;
 import java.util.*;
 import com.trafiklab.busroutecalculator.exception.HttpConnectionException;
+import com.trafiklab.busroutecalculator.exception.InvalidApiKeyException;
+import com.trafiklab.busroutecalculator.exception.RateLimitExceedException;
 import com.trafiklab.busroutecalculator.model.LineWithStops;
 import com.trafiklab.busroutecalculator.model.LinesWithMaxStopResponse;
 import org.apache.logging.log4j.LogManager;
@@ -28,10 +30,12 @@ public class BusRouteService {
      * This function return top 10 bus lines with maximum stops alog with name of all stops for the line.
      * @param string, API key from trafiklab
      * @return LinesWithMaxStopResponse object which contains list of LineWithStops object.
-     * @throws HttpConnectionException If there is any error while calling the external SL REST API
-     * @throws ParseException if there is any error while parsing response data from SL API
+     * @throws HttpConnectionException If there is any error while calling the external SL traffic REST API
+     * @throws ParseException if there is any error while parsing response data from SL traffic API
+     * @throws RateLimitExceedException if the provided API key is exceeded the rate limit for SL traffic API
+     * @throws InvalidApiKeyException if the provided API key is invalid for SL traffic API
      */
-    public LinesWithMaxStopResponse calculateBusRoute(String apiKey, String uuidAsString) throws ParseException, HttpConnectionException {
+    public LinesWithMaxStopResponse calculateBusRoute(String apiKey, String uuidAsString) throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
         List<LineWithStops> responseObjectArray = new ArrayList<LineWithStops>();
         HashMap<String, String> stopPontInfo= fetchStopInfo(apiKey);
         logger.info("UUID:{} fetchStopInfo call is completed",uuidAsString );
@@ -94,22 +98,33 @@ public class BusRouteService {
      * @return HashMap<String, String> where key is stop number and value is stop name.
      * @throws HttpConnectionException If there is any error while calling the external SL REST API
      * @throws ParseException if there is any error while parsing response data from SL API
+     * @throws RateLimitExceedException if the provided API key is exceeded the rate limit for SL traffic API
+     * @throws InvalidApiKeyException if the provided API key is invalid for SL traffic API
      */
-    public HashMap<String, String> fetchStopInfo(String apiKey) throws ParseException, HttpConnectionException {
+    public HashMap<String, String> fetchStopInfo(String apiKey) throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
         String url = buildApiUrl(apiKey, "stop&DefaultTransportModeCode=BUS");
         HashMap<String, String> stopPointNumName = new HashMap<>();
         String httpResponse=fetchApiResponse(url);
-        JSONParser parse2 = new JSONParser();
-        JSONObject data_obj2 = (JSONObject) parse2.parse(httpResponse);
-        JSONObject responseData = (JSONObject) data_obj2.get("ResponseData");
-        JSONArray stopArr = (JSONArray) responseData.get("Result");
-        for (int i = 0; i < stopArr.size(); i++) {
-            JSONObject stopObj = (JSONObject) stopArr.get(i);
-            String stopPointNum = (String) stopObj.get("StopPointNumber");
-            String stoppointName = (String) stopObj.get("StopPointName");
-            stopPointNumName.put(stopPointNum, stoppointName);
+        JSONParser parse = new JSONParser();
+        JSONObject data_obj = (JSONObject) parse.parse(httpResponse);
+        Long statusCode = (Long) data_obj.get("StatusCode");
+        if (statusCode==0) {
+            JSONObject responseData = (JSONObject) data_obj.get("ResponseData");
+            JSONArray stopArr = (JSONArray) responseData.get("Result");
+            for (int i = 0; i < stopArr.size(); i++) {
+                JSONObject stopObj = (JSONObject) stopArr.get(i);
+                String stopPointNum = (String) stopObj.get("StopPointNumber");
+                String stopPointName = (String) stopObj.get("StopPointName");
+                stopPointNumName.put(stopPointNum, stopPointName);
+            }
+            return stopPointNumName;
         }
-        return stopPointNumName;
+        else if(statusCode==1007)
+            throw new RateLimitExceedException((String)data_obj.get("Message"));
+        else if(statusCode==1002)
+            throw new InvalidApiKeyException((String)data_obj.get("Message"));
+        else
+            throw new HttpConnectionException("Server error while making SL API Call");
     }
 
 
@@ -120,16 +135,28 @@ public class BusRouteService {
      * @return JSONArray of JSONObject that contains of LineNumber,DirectionCode,JourneyPatternPointNumber etc .
      * @throws HttpConnectionException If there is any error while calling the external SL REST API
      * @throws ParseException if there is any error while parsing response data from SL API
+     * @throws RateLimitExceedException if the provided API key is exceeded the rate limit for SL traffic API
+     * @throws InvalidApiKeyException if the provided API key is invalid for SL traffic API
      */
-    public JSONArray fetchBusLines(String apiKey) throws ParseException, HttpConnectionException {
+    public JSONArray fetchBusLines(String apiKey) throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException{
         String url = buildApiUrl(apiKey, "jour&DefaultTransportModeCode=BUS");
         String httpResponse=fetchApiResponse(url);
         JSONParser parse = new JSONParser();
         JSONObject data_obj = (JSONObject) parse.parse(httpResponse);
-        //Get the required object from the above created object
-        JSONObject obj = (JSONObject) data_obj.get("ResponseData");
-        JSONArray journeyArr = (JSONArray) obj.get("Result");
-        return journeyArr;
+        Long statusCode = (Long) data_obj.get("StatusCode");
+        if (statusCode==0){
+            //Get the required object from the above created object
+            JSONObject obj = (JSONObject) data_obj.get("ResponseData");
+            JSONArray journeyArr = (JSONArray) obj.get("Result");
+            return journeyArr;
+        }
+        else if(statusCode==1007)
+            throw new RateLimitExceedException((String)data_obj.get("Message"));
+        else if(statusCode==1002)
+            throw new InvalidApiKeyException((String)data_obj.get("Message"));
+        else
+            throw new HttpConnectionException("Server error while making SL API Call");
+
     }
 
 

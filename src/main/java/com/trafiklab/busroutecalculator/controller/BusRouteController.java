@@ -47,6 +47,8 @@ public class BusRouteController {
 package com.trafiklab.busroutecalculator.controller;
 
 import com.trafiklab.busroutecalculator.exception.HttpConnectionException;
+import com.trafiklab.busroutecalculator.exception.InvalidApiKeyException;
+import com.trafiklab.busroutecalculator.exception.RateLimitExceedException;
 import com.trafiklab.busroutecalculator.model.LinesWithMaxStopResponse;
 import com.trafiklab.busroutecalculator.service.BusRouteService;
 import org.apache.logging.log4j.LogManager;
@@ -72,7 +74,7 @@ public class BusRouteController {
     private BusRouteService busRouteService;
     private static final Logger logger = LogManager.getLogger(BusRouteController.class);
     @GetMapping
-    public ResponseEntity<LinesWithMaxStopResponse> busRoute(@RequestParam String apiKey) throws ParseException, HttpConnectionException {
+    public ResponseEntity<LinesWithMaxStopResponse> busRoute(@RequestParam String apiKey) throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
         try {
             HttpHeaders headers = new HttpHeaders();
             UUID uuid = UUID.randomUUID();

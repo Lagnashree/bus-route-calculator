@@ -14,14 +14,14 @@ To ensure scalability and flexibility, it is more practical to have consumers pr
 ### Get the APi key
 
 Follow the below step to get a new trafiklab's API key
- * Step 1: Log in to https://developer.trafiklab.se/login. Register if you dont have an account
+ * Step 1: Log in to https://developer.trafiklab.se/login. Register if you don't have an account
  * Step 2: Create a new project
  * Step 3: Add a new API key to the newly created project and select 'SL Hållplatser och Linjer 2' as 'api'
  * Step 4: Save the newly generated API Key
 
 ## Run locally
 
-### Clone the repositiry to local machine
+### Clone the repository to local machine
 ```
 git clone https://github.com/Lagnashree/bus-route-calculator.git
 ```
