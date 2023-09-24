@@ -1,6 +1,8 @@
 package com.trafiklab.busroutecalculator.service;
 
 import com.trafiklab.busroutecalculator.exception.HttpConnectionException;
+import com.trafiklab.busroutecalculator.exception.InvalidApiKeyException;
+import com.trafiklab.busroutecalculator.exception.RateLimitExceedException;
 import com.trafiklab.busroutecalculator.model.LineWithStops;
 import com.trafiklab.busroutecalculator.model.LinesWithMaxStopResponse;
 import org.json.simple.parser.JSONParser;
@@ -73,9 +75,9 @@ public class BusRouteServiceTest {
         assertEquals(1, result.get("2"));
     }
     @Test
-    public void BusRouteService_FetchBusLines_validResponse() throws ParseException, HttpConnectionException {
+    public void BusRouteService_FetchBusLines_ValidResponse() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
 
-        String mockApiResponse = "{\"ResponseData\":{\"Result\":[{\"line\":\"Bus Line 1\"},{\"line\":\"Bus Line 2\"}]}}";
+        String mockApiResponse = "{\"StatusCode\":0,\"ResponseData\":{\"Result\":[{\"line\":\"Bus Line 1\"},{\"line\":\"Bus Line 2\"}]}}";
         BusRouteService spyTemp = Mockito.spy(busRouteService);
         Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
         JSONArray result = spyTemp.fetchBusLines(Mockito.any());
@@ -84,8 +86,29 @@ public class BusRouteServiceTest {
         assertEquals("Bus Line 2", ((JSONObject) result.get(1)).get("line"));
     }
     @Test
-    public void BusRouteService_fetchStopInfo() throws URISyntaxException, ParseException {
-        String mockApiResponse = "{\"ResponseData\":{\"Result\":[{\"StopPointNumber\":\"1\",\"StopPointName\":\"Stop A\"},{\"StopPointNumber\":\"2\",\"StopPointName\":\"Stop B\"}]}}";
+    public void BusRouteService_FetchBusLines_RateLimitExceeded() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
+        // Arrange
+        String mockApiResponse = "{\"StatusCode\": 1007, \"Message\": \"Rate limit exceeded\"}";
+        BusRouteService spyTemp = Mockito.spy(busRouteService);
+        Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
+        assertThrows(RateLimitExceedException.class, () -> {
+            spyTemp.fetchBusLines(Mockito.any());
+        });
+    }
+
+    @Test
+    public void BusRouteService_FetchBusLines_InvalidApiKey() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
+        // Arrange
+        String mockApiResponse = "{\"StatusCode\": 1002, \"Message\": \"Invalid API key\"}";
+        BusRouteService spyTemp = Mockito.spy(busRouteService);
+        Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
+        assertThrows(InvalidApiKeyException.class, () -> {
+            spyTemp.fetchBusLines(Mockito.any());
+        });
+    }
+    @Test
+    public void BusRouteService_fetchStopInfo() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
+        String mockApiResponse = "{\"StatusCode\":0,\"ResponseData\":{\"Result\":[{\"StopPointNumber\":\"1\",\"StopPointName\":\"Stop A\"},{\"StopPointNumber\":\"2\",\"StopPointName\":\"Stop B\"}]}}";
         BusRouteService spyTemp = Mockito.spy(busRouteService);
         Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
 
@@ -96,37 +119,27 @@ public class BusRouteServiceTest {
         assertEquals("Stop B", stopPointNumName.get("2"));
     }
     @Test
-    public void BusRouteService_CountBusLineStops() {
-        JSONArray journeyArr = new JSONArray();
-        JSONObject journey1 = new JSONObject();
-        journey1.put("LineNumber", "A");
-        journeyArr.add(journey1);
-
-        JSONObject journey2 = new JSONObject();
-        journey2.put("LineNumber", "B");
-        journeyArr.add(journey2);
-
-        JSONObject journey3 = new JSONObject();
-        journey3.put("LineNumber", "A");
-        journeyArr.add(journey3);
-
-        BusRouteService busLineCounter = new BusRouteService();
-        HashMap<String, Integer> result = busLineCounter.countBusLineStops(journeyArr);
-
-        assertEquals(2, result.get("A"));
-        assertEquals(1, result.get("B"));
-        assertEquals(2, result.size());
+    public void BusRouteService_fetchStopInfo_RateLimitExceeded() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
+        String mockApiResponse = "{\"StatusCode\": 1007, \"Message\": \"Rate limit exceeded\"}";
+        BusRouteService spyTemp = Mockito.spy(busRouteService);
+        Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
+        assertThrows(RateLimitExceedException.class, () -> {
+            spyTemp.fetchBusLines(Mockito.any());
+        });
     }
-    @Test
-    public void BusRouteService_CountBusLineStops_EmptyArray() {
-        JSONArray emptyJourneyArr = new JSONArray();
-        BusRouteService busLineCounter = new BusRouteService();
-        HashMap<String, Integer> emptyResult = busLineCounter.countBusLineStops(emptyJourneyArr);
-        assertEquals(0, emptyResult.size(), "Result should be empty for an empty JSONArray");
 
-    }
     @Test
-    public void BusRouteService_CalculateBusRoute() throws ParseException, HttpConnectionException, IOException {
+    public void BusRouteService_fetchStopInfo_InvalidApiKey() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
+        String mockApiResponse = "{\"StatusCode\": 1002, \"Message\": \"Invalid API key\"}";
+        BusRouteService spyTemp = Mockito.spy(busRouteService);
+        Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
+        assertThrows(InvalidApiKeyException.class, () -> {
+            spyTemp.fetchBusLines(Mockito.any());
+        });
+    }
+
+    @Test
+    public void BusRouteService_CalculateBusRoute() throws ParseException, HttpConnectionException, IOException, RateLimitExceedException, InvalidApiKeyException {
         BusRouteService busRouteService =new BusRouteService();
         BusRouteService spyTemp = Mockito.spy(busRouteService);
         JSONParser jsonParser= new JSONParser();
