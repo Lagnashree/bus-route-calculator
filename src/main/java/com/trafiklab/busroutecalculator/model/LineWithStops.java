@@ -29,15 +29,4 @@ public class LineWithStops {
         this.stopNames = stopNames;
     }
 
-    public static class customException {
-        public customException(String title, String detail, String instance) {
-            this.title = title;
-            this.detail = detail;
-            this.instance = instance;
-        }
-
-        private String title;
-        private String detail;
-        private String instance;
-    }
 }

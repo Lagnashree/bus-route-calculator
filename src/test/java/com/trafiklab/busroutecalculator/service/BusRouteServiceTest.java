@@ -80,6 +80,7 @@ public class BusRouteServiceTest {
         String mockApiResponse = "{\"StatusCode\":0,\"ResponseData\":{\"Result\":[{\"line\":\"Bus Line 1\"},{\"line\":\"Bus Line 2\"}]}}";
         BusRouteService spyTemp = Mockito.spy(busRouteService);
         Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
+        // Call the method to be tested
         JSONArray result = spyTemp.fetchBusLines(Mockito.any());
         assertEquals(2, result.size());
         assertEquals("Bus Line 1", ((JSONObject) result.get(0)).get("line"));
@@ -87,7 +88,6 @@ public class BusRouteServiceTest {
     }
     @Test
     public void BusRouteService_FetchBusLines_RateLimitExceeded() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
-        // Arrange
         String mockApiResponse = "{\"StatusCode\": 1007, \"Message\": \"Rate limit exceeded\"}";
         BusRouteService spyTemp = Mockito.spy(busRouteService);
         Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
@@ -98,7 +98,6 @@ public class BusRouteServiceTest {
 
     @Test
     public void BusRouteService_FetchBusLines_InvalidApiKey() throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
-        // Arrange
         String mockApiResponse = "{\"StatusCode\": 1002, \"Message\": \"Invalid API key\"}";
         BusRouteService spyTemp = Mockito.spy(busRouteService);
         Mockito.doReturn(mockApiResponse).when(spyTemp).fetchApiResponse(Mockito.any());
@@ -142,11 +141,15 @@ public class BusRouteServiceTest {
     public void BusRouteService_CalculateBusRoute() throws ParseException, HttpConnectionException, IOException, RateLimitExceedException, InvalidApiKeyException {
         BusRouteService busRouteService =new BusRouteService();
         BusRouteService spyTemp = Mockito.spy(busRouteService);
+
+        // Mock journeyArray
         JSONParser jsonParser= new JSONParser();
         String file ="src/test/resources/journeyarray.json";
         FileReader reader= new FileReader(file);
         Object obj= jsonParser.parse(reader);
         JSONArray mockfetchBusLinesResponse =(JSONArray)obj;
+
+        //mock fetchStopInfo response
         HashMap<String, String>  mockfetchStopInfoResponse=new HashMap<String, String>();;
         mockfetchStopInfoResponse.put("10001", "Stadshagsplan");
         mockfetchStopInfoResponse.put("10002", "John Bergs plan");
@@ -154,6 +157,7 @@ public class BusRouteServiceTest {
         mockfetchStopInfoResponse.put("10008", "S:t Eriksgatan");
         mockfetchStopInfoResponse.put("100011", "Frihamnsporten");
 
+        //mock countBusLineStop response
         HashMap<String, Integer>  mockcountBusLineStopsResponse=new HashMap<String, Integer>();
         mockcountBusLineStopsResponse.put("1",5);
         mockcountBusLineStopsResponse.put("2",3);
@@ -167,10 +171,13 @@ public class BusRouteServiceTest {
         mockcountBusLineStopsResponse.put("10",2);
         mockcountBusLineStopsResponse.put("11",1);
         mockcountBusLineStopsResponse.put("12",1);
+
+        //doReturn when following methods are being called
         Mockito.doReturn(mockfetchStopInfoResponse).when(spyTemp).fetchStopInfo(Mockito.any());
         Mockito.doReturn(mockfetchBusLinesResponse).when(spyTemp).fetchBusLines(Mockito.any());
         Mockito.doReturn(mockcountBusLineStopsResponse).when(spyTemp).countBusLineStops(Mockito.any());
 
+        //Call the method to be tested
         LinesWithMaxStopResponse linesWithMaxStopResponseObj = spyTemp.calculateBusRoute(Mockito.any(),Mockito.any());
         assertNotNull(linesWithMaxStopResponseObj);
         assertEquals("Success", linesWithMaxStopResponseObj.getStatusMessage());
