@@ -35,56 +35,73 @@ public class BusRouteService {
      * @throws RateLimitExceedException if the provided API key is exceeded the rate limit for SL traffic API
      * @throws InvalidApiKeyException if the provided API key is invalid for SL traffic API
      */
-    public LinesWithMaxStopResponse calculateBusRoute(String apiKey, String uuidAsString) throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
-        List<LineWithStops> responseObjectArray = new ArrayList<LineWithStops>();
-        HashMap<String, String> stopPontInfo= fetchStopInfo(apiKey);
-        logger.info("UUID:{} fetchStopInfo call is completed",uuidAsString );
+    public LinesWithMaxStopResponse calculateBusRoute(String apiKey, String uuidAsString)
+            throws ParseException, HttpConnectionException, RateLimitExceedException, InvalidApiKeyException {
+        // Initialize a list to store the response objects
+        List<LineWithStops> responseObjectArray = new ArrayList<>();
+
+        // Fetch stop point information
+        HashMap<String, String> stopPointInfo = fetchStopInfo(apiKey);
+        logger.info("UUID:{} fetchStopInfo call is completed", uuidAsString);
+
+        // Fetch bus lines
         JSONArray journeyArr = fetchBusLines(apiKey);
-        logger.info("UUID:{} fetchBusLines call is completed",uuidAsString );
-        HashMap<String, Integer> lineCount =countBusLineStops(journeyArr);
-        logger.info("UUID:{} countBusLineStops call is completed",uuidAsString );
+        logger.info("UUID:{} fetchBusLines call is completed", uuidAsString);
+
+        // Count the number of stops for each bus line
+        HashMap<String, Integer> lineCount = countBusLineStops(journeyArr);
+        logger.info("UUID:{} countBusLineStops call is completed", uuidAsString);
+
+        // Sort the bus lines by the number of stops in descending order
         List<Map.Entry<String, Integer>> entryList = new ArrayList<>(lineCount.entrySet());
-        Comparator<Map.Entry<String, Integer>> valueComparator = (entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue());
-        Collections.sort(entryList, valueComparator);
+        entryList.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+
+        // Create a LinkedHashMap to store the sorted bus lines
         LinkedHashMap<String, Integer> sortedHashMap = new LinkedHashMap<>();
         for (Map.Entry<String, Integer> entry : entryList) {
             sortedHashMap.put(entry.getKey(), entry.getValue());
         }
 
+        // Initialize a map to store the top 10 lines with the most stops
         HashMap<String, List<String>> lineWithStopNum = new HashMap<>();
         int count = 0;
-        logger.info("UUID:{} Top 10 lines with max stops",uuidAsString );
+        logger.info("UUID:{} Top 10 lines with max stops", uuidAsString);
         for (Map.Entry<String, Integer> entry : sortedHashMap.entrySet()) {
             if (count < 10) {
-                logger.info("Line number: {}",entry.getKey());
+                logger.info("Line number: {}", entry.getKey());
                 lineWithStopNum.put(entry.getKey(), new ArrayList<>());
                 count++;
             } else {
                 break;
             }
         }
+
+        // Populate the map with stop information for the top 10 lines
         for (int i = 0; i < journeyArr.size(); i++) {
-            JSONObject journey_obj = (JSONObject) journeyArr.get(i);
-            String lineNumber = (String) journey_obj.get("LineNumber");
+            JSONObject journeyObj = (JSONObject) journeyArr.get(i);
+            String lineNumber = (String) journeyObj.get("LineNumber");
             if (lineWithStopNum.containsKey(lineNumber)) {
-                String JourneyPatternPointNumber = (String) journey_obj.get("JourneyPatternPointNumber");
-                lineWithStopNum.get(lineNumber).add((String) stopPontInfo.get(JourneyPatternPointNumber));
+                String journeyPatternPointNumber = (String) journeyObj.get("JourneyPatternPointNumber");
+                lineWithStopNum.get(lineNumber).add(stopPointInfo.get(journeyPatternPointNumber));
             }
         }
+
+        // Create the response objects for the top 10 lines
         int count1 = 0;
         for (Map.Entry<String, Integer> entry : sortedHashMap.entrySet()) {
             if (count1 < 10) {
-                LineWithStops LineWithStopsObj = new LineWithStops();
-                LineWithStopsObj.setLineNumber(entry.getKey());
-                LineWithStopsObj.setStopNames(lineWithStopNum.get(entry.getKey()));
-                responseObjectArray.add(LineWithStopsObj);
+                LineWithStops lineWithStopsObj = new LineWithStops();
+                lineWithStopsObj.setLineNumber(entry.getKey());
+                lineWithStopsObj.setStopNames(lineWithStopNum.get(entry.getKey()));
+                responseObjectArray.add(lineWithStopsObj);
                 count1++;
             } else {
                 break;
             }
         }
 
-        LinesWithMaxStopResponse linesWithMaxStopResponseObj =new LinesWithMaxStopResponse();
+        // Create and return the final response object
+        LinesWithMaxStopResponse linesWithMaxStopResponseObj = new LinesWithMaxStopResponse();
         linesWithMaxStopResponseObj.setStatusMessage("Success");
         linesWithMaxStopResponseObj.setResponseData(responseObjectArray);
         return linesWithMaxStopResponseObj;
