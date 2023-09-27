@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.mockito.InjectMocks;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
 @ExtendWith(MockitoExtension.class)
