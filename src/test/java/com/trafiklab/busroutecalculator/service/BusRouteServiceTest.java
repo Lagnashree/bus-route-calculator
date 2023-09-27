@@ -170,12 +170,12 @@ public class BusRouteServiceTest {
         mockcountBusLineStopsResponse.put("11",1);
         mockcountBusLineStopsResponse.put("12",1);
 
-        //doReturn when following methods are being called
+    
         Mockito.doReturn(mockfetchStopInfoResponse).when(spyTemp).fetchStopInfo(Mockito.any());
         Mockito.doReturn(mockfetchBusLinesResponse).when(spyTemp).fetchBusLines(Mockito.any());
         Mockito.doReturn(mockcountBusLineStopsResponse).when(spyTemp).countBusLineStops(Mockito.any());
 
-        //Call the method to be tested
+      
         LinesWithMaxStopResponse linesWithMaxStopResponseObj = spyTemp.calculateBusRoute(Mockito.any(),Mockito.any());
         assertNotNull(linesWithMaxStopResponseObj);
         assertEquals("Success", linesWithMaxStopResponseObj.getStatusMessage());
@@ -190,7 +190,6 @@ public class BusRouteServiceTest {
         assertEquals("John Bergs plan", stopNames.get(1));
         assertEquals("Arbetargatan", stopNames.get(2));
 
-        // Add more assertions based on the expected behavior of the function
     }
 }
 
