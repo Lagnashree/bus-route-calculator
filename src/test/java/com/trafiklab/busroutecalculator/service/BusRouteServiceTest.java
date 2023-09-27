@@ -24,9 +24,9 @@ import java.util.Map;
 import org.mockito.Mockito;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class BusRouteServiceTest {
-    @Autowired
+    @InjectMocks
     private BusRouteService busRouteService;
 
 
